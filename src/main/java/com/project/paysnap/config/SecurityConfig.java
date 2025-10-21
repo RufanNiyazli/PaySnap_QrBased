@@ -35,7 +35,7 @@ public class SecurityConfig {
 
 
                 })).authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/*").permitAll()
+                        .requestMatchers("/public/*","/success.html","/cancel.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authenticationProvider(authenticationProvider).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
