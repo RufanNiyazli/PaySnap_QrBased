@@ -19,16 +19,17 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
 
-    public SecretKey getKey() {
-        byte[] keyBytes = Decoders.BASE64URL.decode(SECRET_KEY);
+    private SecretKey getKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateToken(UserDetails userDetails) {
         try {
             return Jwts.builder()
-                    .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                    .subject(userDetails.getUsername())
                     .issuedAt(new Date())
+                    .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 saat
                     .signWith(getKey(), Jwts.SIG.HS256)
                     .compact();
 
