@@ -21,10 +21,16 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
+    @Column(name = "payment_url", length = 500)
+    private String paymentUrl;
+
+    @Column(name = "stripe_session_id", length = 500)
+    private String stripeSessionId;
+
+    @Column(name = "description", length = 1000)
     private String description;
     private Long amount;
     private String currency;
-    private String stripeSessionId;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
     private LocalDateTime createdAt;

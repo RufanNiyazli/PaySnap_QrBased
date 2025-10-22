@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class BlacklistServiceImpl implements BlacklistService {
     private final StringRedisTemplate redisTemplate;
     private static final String BLACKLIST_TOKEN = "blacklist:";
-
+// blacklist service user logout olubsa onu  blackliste alir blackliste alindiginie jwt auth filterde yoxlayiriq
 
     @Override
     public void blacklistToken(String token, Long expirationMillis) {
