@@ -15,7 +15,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.bind.annotation.RestController;
 
 @Configuration
-@RestController
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
@@ -29,13 +28,13 @@ public class SecurityConfig {
                     var corsConfig = new org.springframework.web.cors.CorsConfiguration();
                     corsConfig.setAllowedOrigins(java.util.List.of("*"));
                     corsConfig.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
-                    corsConfig.setAllowedHeaders(java.util.List.of("*"));
+                    corsConfig.setAllowedOrigins(java.util.List.of("http://localhost:3000", "http://localhost:8080"));
                     corsConfig.setAllowCredentials(true);
                     return corsConfig;
 
 
                 })).authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/*","/success","/cancel").permitAll()
+                        .requestMatchers("/public/*", "/success.html", "/cancel.html", "/api/webhook/stripe").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authenticationProvider(authenticationProvider).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
