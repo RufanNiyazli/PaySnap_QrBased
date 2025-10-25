@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
 public class ReceiptService {
     @Async
     public CompletableFuture<String> generateReceipt(Order order) {
-        String path = System.getProperty("java.io.tmpdir") + "/receipt_" + order.getId() + ".pdf";
+        String path = System.getProperty("java.io.tmpdir") + "//receipt_" + order.getId() + ".pdf";
         try {
             Document document = new Document();
             PdfWriter.getInstance(document, new FileOutputStream(path));
@@ -39,6 +39,7 @@ public class ReceiptService {
                     order.getCompletedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), normalFont));
 
             document.add(new Paragraph("\nThank you for your payment!", normalFont));
+            document.close();
             log.info("Pdf created successfully at {}", path);
             return CompletableFuture.completedFuture(path);
 

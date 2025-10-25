@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.paysnap.entity.Order;
 import com.project.paysnap.enums.OrderStatus;
 import com.project.paysnap.repository.OrderRepository;
+import com.project.paysnap.service.impl.EmailService;
+import com.project.paysnap.service.impl.ReceiptService;
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
@@ -25,6 +27,9 @@ public class WebhookController {
     private String WEBHOOK_SECRET;
     private final ObjectMapper objectMapper;
     private final OrderRepository orderRepository;
+    private final ReceiptService receiptService;
+    private final EmailService emailService;
+
     @PostMapping("/stripe")
     public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) {
         Event event;
@@ -56,6 +61,20 @@ public class WebhookController {
         log.info("Payment completed for order ID {}", order.getId());
         orderRepository.save(order);
 
+        receiptService.generateReceipt(order).thenAccept(pdfPath -> {
+            String subject = "Your Payment Receipt";
+            String text = """
+                    Hello %s,
+                    
+                    Thank you for your payment!
+                    Your order #%s has been successfully processed.
+                    Please find your payment receipt attached.
+                    
+                    — PaySnap Team
+                    """.formatted(order.getUser().getUsername(), order.getId());
+            emailService.sendReceiptEmail(order.getUser().getEmail(), subject, text, pdfPath);
+        });
+
     }
 
     private void handleCheckoutExpired(Event event) {
@@ -66,6 +85,7 @@ public class WebhookController {
                 .findFirst().orElseThrow(() -> new RuntimeException("not find "));
         order.setOrderStatus(OrderStatus.CANCELED);
         orderRepository.save(order);
+        log.info("Payment expired for order ID {}", order.getId());
     }
 
 }
